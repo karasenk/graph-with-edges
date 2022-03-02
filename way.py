@@ -27,8 +27,11 @@ class Board:
 
     def walk(self, coord0, x, y, n):
         self.board[x][y] = n
-        self.graph[x][y] = coord0
+        # self.graph[x][y] = coord0
         self.visited.append((x, y))
+        for row in self.visited:
+            if math.inf in row:
+                return True
         v = []
         if x - 1 >= 0 and (x - 1, y) not in self.visited:
             v.append((x - 1, y))
@@ -49,7 +52,6 @@ class Board:
         if self.start == (x, y) or not isinstance(self.graph[x][y], tuple):
             return way
         way.append(self.graph[x][y])
-        print(self.graph[x][y])
         x1, y1 = self.graph[x][y]
         return self.get_way(x1, y1, way)
 
@@ -69,6 +71,8 @@ def shortest_way(edges0, start, finish):
     board = Board(edges, start, finish)
     x, y = board.start
     board.walk((x, y), x, y, 0)
+    for g in board.graph:
+        print(g)
     x1, y1 = board.finish
-    way = board.get_way(x1, y1, [])
-    return [(coord[0] + 1, coord[1] + 1) for coord in way]
+    way = board.get_way(x1, y1, [(x1, y1)])
+    return [(coord[0] + 1, coord[1] + 1) for coord in way][::-1]
