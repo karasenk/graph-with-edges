@@ -17,13 +17,12 @@ class Board:
                 return e[2]
         return 1
 
-    def mark(self, coords, n, coord0):
-        for coord in coords:
-            x, y = coord
-            weight = self.get_value(coord, coord0)
-            if self.board[x][y] > n + weight:
-                self.board[x][y] = n + weight
-                self.graph[x][y] = coord0
+    def mark(self, coord, n, coord0):
+        x, y = coord
+        weight = self.get_value(coord, coord0)
+        if self.board[x][y] > n + weight:
+            self.board[x][y] = n + weight
+            self.graph[x][y] = coord0
 
     def walk(self, coord0, x, y, n):
         self.board[x][y] = n
@@ -32,21 +31,24 @@ class Board:
         for row in self.visited:
             if math.inf in row:
                 return True
-        v = []
         if x - 1 >= 0 and (x - 1, y) not in self.visited:
-            v.append((x - 1, y))
+            self.mark((x - 1, y), n, (x, y))
         if x + 1 < 7 and (x + 1, y) not in self.visited:
-            v.append((x + 1, y))
+            self.mark((x + 1, y), n, (x, y))
         if y - 1 >= 0 and (x, y - 1) not in self.visited:
-            v.append((x, y - 1))
+            self.mark((x, y - 1), n, (x, y))
         if y + 1 < 5 and (x, y + 1) not in self.visited:
-            v.append((x, y + 1))
-        if v:
-            self.mark(v, n, (x, y))
-            next_point = min(v, key=lambda a: self.board[a[0]][a[1]])
-            n += self.get_value((x, y), next_point)
-            return self.walk((x, y), next_point[0], next_point[1], n)
-        return True
+            self.mark((x, y + 1), n, (x, y))
+        values = []
+        for i in range(len(self.board)):
+            for j in range(len(self.board[i])):
+                if (i, j) not in self.visited:
+                    values.append((i, j))
+        if not values:
+            return True
+        next_point = min(values, key=lambda w: self.board[w[0]][w[1]])
+        n += self.get_value((x, y), next_point)
+        return self.walk((x, y), next_point[0], next_point[1], n)
 
     def get_way(self, x, y, way):
         if self.start == (x, y) or not isinstance(self.graph[x][y], tuple):
@@ -71,8 +73,6 @@ def shortest_way(edges0, start, finish):
     board = Board(edges, start, finish)
     x, y = board.start
     board.walk((x, y), x, y, 0)
-    for g in board.graph:
-        print(g)
     x1, y1 = board.finish
     way = board.get_way(x1, y1, [(x1, y1)])
     return [(coord[0] + 1, coord[1] + 1) for coord in way][::-1]
