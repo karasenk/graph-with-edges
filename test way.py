@@ -1,6 +1,6 @@
 from way import shortest_way
 
-alphabet = {'А': 0, 'Б': 1, 'В': 2, 'Г': 3, 'Д': 4, 'Е': 5, 'Ж': 6}
+alphabet = {'А': 1, 'Б': 2, 'В': 3, 'Г': 4, 'Д': 5, 'Е': 6, 'Ж': 7}
 f = open('data.txt', 'r', encoding='utf-8')
 e = eval(f.read())
 f.close()
@@ -10,4 +10,4 @@ for coord in e:
     b = alphabet[coord[1][0]], int(coord[1][1])
     edges.append([a, b, int(coord[2])])
 
-print(shortest_way(edges, (1, 3), (7, 1)))
+print(shortest_way(edges, (1, 3), (4, 5)))
