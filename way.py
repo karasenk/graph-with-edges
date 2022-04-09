@@ -77,7 +77,8 @@ class Board:
     # принимает координаты у которых отсчёт начинается с 1 (н-р не (0, 0), а (1, 1))
     # возвращает путь в виде списка координат (н-р [(1, 2), (1, 3), (1, 4)]) (отсчёт тоже с 1)
 def shortest_way(edges0, start, target):
-    finish, n = target
+    finish = target
+    n = int(str(target[0]) + str(target[1]))
     edges = []
     start = start[0] - 1, start[1] - 1
     finish = finish[0] - 1, finish[1] - 1
