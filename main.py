@@ -68,7 +68,7 @@ def start_decode():
 
     a = len(data)
     b = a / 9
-    r = 35
+    r = 33
     sps = []
     for i in range(9):
         n=data[int(b/2+b*i)]
@@ -142,7 +142,7 @@ start2 = 0
 start_decode()
 
 
-
+'''
 alphabet = {'А': 1, 'Б': 2, 'В': 3, 'Г': 4, 'Д': 5, 'Е': 6, 'Ж': 7}
 f = open('data.txt', 'r', encoding='utf-8')
 e = eval(f.read())
@@ -161,3 +161,4 @@ test = way[1:]
 point()
 start2 = startt
 finishh()
+'''
