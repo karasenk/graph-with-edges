@@ -52,6 +52,75 @@ class Board:
         x1, y1 = self.graph[x][y]
         return self.get_way(x1, y1, way)
 
+    def calculate_finish(self):
+        points = []
+        x, y = self.finish
+        if x - 2 >= 0:
+            points.append(([(x - 1, y), (x - 2, y)],
+                           self.get_value((x, y), (x - 1, y)) +
+                           self.get_value((x - 1, y), (x - 2, y))))
+        if x + 2 < 7:
+            points.append(([(x + 1, y), (x + 2, y)],
+                           self.get_value((x, y), (x + 1, y)) +
+                           self.get_value((x + 1, y), (x + 2, y))))
+        if y - 2 >= 0:
+            points.append(([(x, y - 1), (x, y - 2)],
+                           self.get_value((x, y), (x, y - 1)) +
+                           self.get_value((x, y - 1), (x, y - 2))))
+        if y + 2 < 5:
+            points.append(([(x, y + 1), (x, y + 2)],
+                           self.get_value((x, y), (x, y + 1)) +
+                           self.get_value((x, y + 1), (x, y + 2))))
+        if x + 1 < 7 and y + 1 < 5:
+            n0 = self.get_value((x, y), (x + 1, y)) +\
+                 self.get_value((x + 1, y), (x + 1, y + 1))
+            n1 = self.get_value((x, y), (x, y + 1)) +\
+                 self.get_value((x, y + 1), (x + 1, y + 1))
+            if n0 < n1:
+                points.append(([(x + 1, y), (x + 1, y + 1)], n0))
+            else:
+                points.append(([(x, y + 1), (x + 1, y + 1)], n1))
+        if x + 1 < 7 and y - 1 >= 0:
+            n0 = self.get_value((x, y), (x + 1, y)) +\
+                 self.get_value((x + 1, y), (x + 1, y - 1))
+            n1 = self.get_value((x, y), (x, y - 1)) +\
+                 self.get_value((x, y - 1), (x + 1, y - 1))
+            if n0 < n1:
+                points.append(([(x + 1, y), (x + 1, y - 1)], n0))
+            else:
+                points.append(([(x, y - 1), (x + 1, y - 1)], n1))
+        if x - 1 >= 0 and y + 1 < 5:
+            n0 = self.get_value((x, y), (x - 1, y)) +\
+                 self.get_value((x - 1, y), (x - 1, y + 1))
+            n1 = self.get_value((x, y), (x, y + 1)) +\
+                 self.get_value((x, y + 1), (x - 1, y + 1))
+            if n0 < n1:
+                points.append(([(x - 1, y), (x - 1, y + 1)], n0))
+            else:
+                points.append(([(x, y + 1), (x - 1, y + 1)], n1))
+        if x - 1 >= 0 and y - 1 >= 0:
+            n0 = self.get_value((x, y), (x - 1, y)) +\
+                 self.get_value((x - 1, y), (x - 1, y - 1))
+            n1 = self.get_value((x, y), (x, y - 1)) +\
+                 self.get_value((x, y - 1), (x - 1, y - 1))
+            if n0 < n1:
+                points.append(([(x - 1, y), (x - 1, y - 1)], n0))
+            else:
+                points.append(([(x, y - 1), (x + 1, y - 1)], n1))
+        res = min(points, key=lambda p: p[1])[0]
+        a, b = res[-1]
+        dirs = []
+        if a + 1 < 7:
+            dirs.append(((a + 1, b), self.get_value((a, b), (a + 1, b))))
+        if a - 1 >= 0:
+            dirs.append(((a - 1, b), self.get_value((a, b), (a - 1, b))))
+        if b + 1 < 5:
+            dirs.append(((a, b + 1), self.get_value((a, b), (a, b + 1))))
+        if b - 1 >= 0:
+            dirs.append(((a, b - 1), self.get_value((a, b), (a, b - 1))))
+        return res, min(dirs, key=lambda w: w[1])[0]
+
+
     # это - функция, которую, получается, нужно импортировать в код с движением.
     # принимает список рёбер с их весом, координату старта, координату финиша.
     # принимает координаты у которых отсчёт начинается с 1 (н-р не (0, 0), а (1, 1))
@@ -68,5 +137,8 @@ def shortest_way(edges0, start, finish):
         edges.append([a, b, int(coord[2])])
     board = Board(edges, start, finish)
     board.walk(start[0], start[1])
-    way = board.get_way(finish[0], finish[1], [finish])
-    return [(coord[0] + 1, coord[1] + 1) for coord in way[::-1]]
+    way = board.get_way(finish[0], finish[1], [finish])[::-1]
+    w, dir_point = board.calculate_finish()
+    way += w
+    dir_point = dir_point[0] + 1, dir_point[1] + 1
+    return [(coord[0] + 1, coord[1] + 1) for coord in way], dir_point
